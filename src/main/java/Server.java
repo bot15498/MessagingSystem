@@ -16,7 +16,16 @@ public class Server {
 			PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
 			BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
-
+			out.println("Hey");
+			String input;
+			while((input = in.readLine()) != null) {
+				if(input.equals("Hey start dash!")) {
+					out.println("Nice.");
+					break;
+				} else {
+					out.println("please laugh.");
+				}
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
