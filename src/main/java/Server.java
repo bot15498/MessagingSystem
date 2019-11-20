@@ -1,4 +1,6 @@
+import Threads.PrintThread;
 import Threads.ServerThread;
+import Utils.Util;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -23,9 +25,14 @@ public class Server {
 			System.err.println("Could not start Server socket");
 			System.exit(1);
 		}
-		System.out.println("Starting Server ...");
+
+		// Start thread that prints to console.
+//		PrintThread printer = PrintThread.getInstance();
+//		printer.addToQueue("Starting Server...");
+		Util.println("Starting Server...");
+
 		// now listen for incomming requests and create a server thread if a socket is found
-		while(true) {
+		while (true) {
 			try {
 				clientSocket = serverSocket.accept();
 			} catch (IOException e) {
