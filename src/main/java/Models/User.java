@@ -1,6 +1,7 @@
 package Models;
 
 import Utils.MessageFactory;
+import Utils.UserConnectMessageFields;
 import org.json.simple.JSONObject;
 
 public class User {
@@ -11,7 +12,7 @@ public class User {
 	}
 
 	public User(JSONObject json) {
-		nickname = (String) json.get("nickname");
+		nickname = (String) json.get(UserConnectMessageFields.USER_NICKNAME);
 	}
 
 	public String toJSONString() {

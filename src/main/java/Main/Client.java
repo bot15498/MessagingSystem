@@ -1,6 +1,7 @@
+package Main;
+
 import Models.User;
 import Threads.ClientReceiveThread;
-import Threads.PrintThread;
 import Utils.MessageFactory;
 import Utils.Util;
 import org.json.simple.JSONObject;
@@ -17,20 +18,16 @@ public class Client {
 	private static final String hostname = "DESKTOP-IM3S6B7";
 
 	public static void main(String[] args) {
-		// Start thread that prints to console.
-//		PrintThread printer = PrintThread.getInstance();
-//		printer.addToQueue("Starting Client...");
-		Util.println("Starting Client...");
-
+		Util.println("Starting Main.Client...");
 
 		// Get nickname for server purposes
 		Scanner scan = new Scanner(System.in);
 		Util.println("Enter nickname: ");
 		String nickname = scan.nextLine();
 		User user = new User(nickname);
-		ClientReceiveThread printThread;
+		ClientReceiveThread printThread = null;
 
-		// make connection to Server.
+		// make connection to Main.Server.
 		try {
 			Socket serverSocket = new Socket(hostname, port);
 			PrintWriter out = new PrintWriter(serverSocket.getOutputStream(), true);
@@ -42,10 +39,6 @@ public class Client {
 
 			// Tell server user information
 			out.println(user.toJSONString());
-//			fromServer = in.readLine();
-//			if(fromServer != null) {
-//				out.println(user.toJSONString());
-//			}
 
 			boolean isRunning = true;
 			while (isRunning) {
@@ -54,7 +47,7 @@ public class Client {
 			}
 			printThread.stopListening();
 		} catch (IOException e) {
-			System.err.println("Connection with Server failed.");
+			System.err.println("Connection with Main.Server failed.");
 			e.printStackTrace();
 		}
 	}
