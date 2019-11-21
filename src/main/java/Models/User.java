@@ -16,7 +16,7 @@ public class User {
 	}
 
 	public String toJSONString() {
-		return MessageFactory.createUserConnectRequestMessage(nickname).toJSONString();
+		return MessageFactory.createUserInitConnectRequestMessage(nickname).toJSONString();
 	}
 
 	public String getNickname() {

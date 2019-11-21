@@ -4,6 +4,7 @@ import Models.User;
 import Threads.ServerCommandsThread;
 import Threads.ServerHandleClientThread;
 import Utils.MessageFactory;
+import Utils.PrivateMessageFields;
 import Utils.Util;
 import org.json.simple.JSONObject;
 
@@ -33,7 +34,7 @@ public class Server {
 			serverSocket = new ServerSocket(port);
 		} catch (IOException e) {
 			e.printStackTrace();
-			System.err.println("Could not start Main.Server socket");
+			System.err.println("Could not start Server socket");
 			System.exit(1);
 		}
 		Util.println("Starting Server...");
@@ -46,7 +47,7 @@ public class Server {
 		return instance;
 	}
 
-	public void handleIncommingRequests() {
+	private void handleIncommingRequests() {
 		Socket clientSocket = null;
 		ServerCommandsThread commandsThread = new ServerCommandsThread();
 		commandsThread.start();
@@ -72,16 +73,34 @@ public class Server {
 		connectedUsers.put(user.getNickname(), user);
 	}
 
+	public synchronized void removeThread(User user) {
+		connectedThreads.remove(user.getNickname());
+		connectedUsers.remove(user.getNickname());
+	}
+
 	public synchronized void broadcastGlobalMessage(JSONObject msg) {
-		for(ServerHandleClientThread thread : connectedThreads.values()) {
+		for (ServerHandleClientThread thread : connectedThreads.values()) {
 			thread.sendMessageToClient(msg);
 		}
 	}
 
 	public synchronized void broadcastGlobalMessage(User sender, String msg) {
 		JSONObject json = MessageFactory.createGlobalMessage(sender, msg);
-		for(ServerHandleClientThread thread : connectedThreads.values()) {
+		for (ServerHandleClientThread thread : connectedThreads.values()) {
 			thread.sendMessageToClient(json);
+		}
+	}
+
+	public synchronized void sendPrivateMessage(User sender, String recipient, String msg) {
+		if (connectedUsers.containsKey(recipient)) {
+			JSONObject json = MessageFactory.createPrivateMessage(sender, recipient, msg);
+			connectedThreads.get(recipient).sendMessageToClient(json);
+		}
+	}
+
+	public synchronized void sendPrivateMessage(JSONObject json) {
+		if (connectedUsers.containsKey((String) json.get(PrivateMessageFields.RECIPIENT))) {
+			connectedThreads.get((String) json.get(PrivateMessageFields.RECIPIENT)).sendMessageToClient(json);
 		}
 	}
 }

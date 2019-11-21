@@ -15,10 +15,10 @@ import java.net.Socket;
 
 public class ServerHandleClientThread extends Thread {
 	private Socket socket;
-	PrintWriter out;
-	BufferedReader in;
-	boolean isConnected;
-	User currUser = null;
+	private PrintWriter out;
+	private BufferedReader in;
+	private boolean isConnected;
+	private User currUser = null;
 
 	public ServerHandleClientThread(Socket clientSocket) {
 		this.socket = clientSocket;
@@ -45,22 +45,26 @@ public class ServerHandleClientThread extends Thread {
 			e.printStackTrace();
 			System.err.println("Failed to start connection with user.");
 		}
+		// Main loop for user input.
 		if (currUser != null) {
 			String inputLine;
 			try {
-				while ((inputLine = in.readLine()) != null) {
+				while (isConnected && (inputLine = in.readLine()) != null) {
 					Util.println(inputLine);
 					JSONObject json = Util.stringToJson(inputLine);
 					handleIncommingMessage(json);
 					yield();
 				}
 			} catch (IOException e) {
-				e.printStackTrace();
-				System.err.println("Connection error with user: " + currUser.getNickname());
+				// This gets called if client forcefully disconnects.
+				Util.println("User " + currUser.getNickname() + " disconnected.");
+				isConnected = false;
+				Server.getInstance().removeThread(currUser);
+				currUser = null;
 			} catch (ParseException e) {
 				// TODO Figure out what happens if a client sends garbage.
 				// right now just continue listening.
-				Util.println("Received uninteligible message from " + currUser.getNickname() + ".");
+				Util.println("Received unintelligible message from " + currUser.getNickname() + ".");
 			}
 		}
 	}
@@ -75,16 +79,31 @@ public class ServerHandleClientThread extends Thread {
 			case MessageTypes.GLOBAL_CHAT_MSG:
 				// just update the timestamp and user (just in case) and rebraodcast.
 				if (currUser.getNickname().equals(json.get(GlobalMessageFields.SENDER))) {
-					Util.updateTimestamp(json);
-					Server.getInstance().broadcastGlobalMessage(json);
+					JSONObject j = Util.updateTimestamp(json);
+					Server.getInstance().broadcastGlobalMessage(j);
 				}
 				break;
 			case MessageTypes.PRIVATE_CHAT_MSG:
+				// send to only that one person
+				if (currUser.getNickname().equals(json.get(PrivateMessageFields.SENDER))) {
+					JSONObject j = Util.updateTimestamp(json);
+					Server.getInstance().sendPrivateMessage(j);
+				}
 				break;
 			case MessageTypes.SERVER_MSG:
 				break;
 			case MessageTypes.USER_CONNECT:
-				// Oh god what are you doing client.
+				String connectType = (String) json.get(UserConnectMessageFields.CONNECT_TYPE);
+				switch(connectType){
+					case UserConnectMessageFields.ConnectTypes.INITIAL_CONNECT:
+						break;
+					case UserConnectMessageFields.ConnectTypes.DISCONNECT:
+						isConnected = false;
+						Server.getInstance().removeThread(currUser);
+						Util.println("User " + currUser.getNickname() + " disconnected.");
+						currUser = null;
+						break;
+				}
 				break;
 		}
 	}
