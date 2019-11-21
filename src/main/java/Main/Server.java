@@ -1,6 +1,7 @@
 package Main;
 
 import Models.User;
+import Threads.ServerCommandsThread;
 import Threads.ServerHandleClientThread;
 import Utils.MessageFactory;
 import Utils.Util;
@@ -10,11 +11,13 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 
 public class Server {
 	private ServerSocket serverSocket = null;
-	private ArrayList<ServerHandleClientThread> connectedThreads = new ArrayList<ServerHandleClientThread>();
-	private ArrayList<User> connectedUsers = new ArrayList<User>();
+	private HashMap<String, ServerHandleClientThread> connectedThreads = new HashMap<String, ServerHandleClientThread>();
+	private HashMap<String, User> connectedUsers = new HashMap<String, User>();
 
 	// Static stuff
 	private static final int port = 4444;
@@ -33,7 +36,7 @@ public class Server {
 			System.err.println("Could not start Main.Server socket");
 			System.exit(1);
 		}
-		Util.println("Starting Main.Server...");
+		Util.println("Starting Server...");
 	}
 
 	public static Server getInstance() {
@@ -45,6 +48,8 @@ public class Server {
 
 	public void handleIncommingRequests() {
 		Socket clientSocket = null;
+		ServerCommandsThread commandsThread = new ServerCommandsThread();
+		commandsThread.start();
 		// now listen for incomming requests and create a server thread if a socket is found
 		while (true) {
 			try {
@@ -54,24 +59,28 @@ public class Server {
 			}
 			// start thread for handling sockets.
 			ServerHandleClientThread thread = new ServerHandleClientThread(clientSocket);
-			connectedThreads.add(thread);
 			thread.start();
 		}
 	}
 
-	public synchronized ArrayList<User> getListOfUsers() {
-		return connectedUsers;
+	public synchronized Collection<User> getListOfUsers() {
+		return connectedUsers.values();
+	}
+
+	public synchronized void addThread(User user, ServerHandleClientThread thread) {
+		connectedThreads.put(user.getNickname(), thread);
+		connectedUsers.put(user.getNickname(), user);
 	}
 
 	public synchronized void broadcastGlobalMessage(JSONObject msg) {
-		for(ServerHandleClientThread thread : connectedThreads) {
+		for(ServerHandleClientThread thread : connectedThreads.values()) {
 			thread.sendMessageToClient(msg);
 		}
 	}
 
 	public synchronized void broadcastGlobalMessage(User sender, String msg) {
 		JSONObject json = MessageFactory.createGlobalMessage(sender, msg);
-		for(ServerHandleClientThread thread : connectedThreads) {
+		for(ServerHandleClientThread thread : connectedThreads.values()) {
 			thread.sendMessageToClient(json);
 		}
 	}

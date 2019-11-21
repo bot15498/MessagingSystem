@@ -18,7 +18,7 @@ public class Client {
 	private static final String hostname = "DESKTOP-IM3S6B7";
 
 	public static void main(String[] args) {
-		Util.println("Starting Main.Client...");
+		Util.println("Starting Client...");
 
 		// Get nickname for server purposes
 		Scanner scan = new Scanner(System.in);

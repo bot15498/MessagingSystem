@@ -39,6 +39,7 @@ public class ServerHandleClientThread extends Thread {
 			if (json.get(UserConnectMessageFields.TYPE).equals(MessageTypes.USER_CONNECT)) {
 				currUser = new User(json);
 				Util.println("User " + currUser.getNickname() + " connected.");
+				Server.getInstance().addThread(currUser, this);
 			}
 		} catch (IOException | ParseException e) {
 			e.printStackTrace();
@@ -73,7 +74,7 @@ public class ServerHandleClientThread extends Thread {
 		switch (type) {
 			case MessageTypes.GLOBAL_CHAT_MSG:
 				// just update the timestamp and user (just in case) and rebraodcast.
-				if(currUser.getNickname().equals(json.get(GlobalMessageFields.SENDER))) {
+				if (currUser.getNickname().equals(json.get(GlobalMessageFields.SENDER))) {
 					Util.updateTimestamp(json);
 					Server.getInstance().broadcastGlobalMessage(json);
 				}
