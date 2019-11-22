@@ -16,6 +16,7 @@ import java.util.Scanner;
 public class Client {
 	private static final int port = 4444;
 	private static final String hostname = "DESKTOP-IM3S6B7";
+	private static boolean isRunning = true;
 
 	public static void main(String[] args) {
 		Util.println("Starting Client...");
@@ -41,12 +42,13 @@ public class Client {
 			out.println(user.toJSONString());
 
 			Util.println("Successfully connected to server.");
-			boolean isRunning = true;
 			while (isRunning) {
 				String command = scan.nextLine();
 				handleCommand(out, user, command);
 			}
 			printThread.stopListening();
+			serverSocket.close();
+			Util.println("Disconnected from server.");
 		} catch (IOException e) {
 			System.err.println("Connection with Main.Server failed.");
 			e.printStackTrace();
@@ -59,10 +61,15 @@ public class Client {
 			case "/disconnect":
 			case "/leave":
 				out.println(MessageFactory.createUserDisconnectRequestMessage(user).toJSONString());
+				// Now we exit
+				isRunning = false;
 				break;
 			case "/whisper":
 			case "/message":
 				out.println(MessageFactory.createPrivateMessage(user, splits[1],splits[2]));
+				break;
+			case "/users":
+			case "/u":
 				break;
 			default:
 				out.println(MessageFactory.createGlobalMessage(user, command).toJSONString());
