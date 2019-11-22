@@ -11,6 +11,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Scanner;
 
@@ -54,7 +55,7 @@ public class Client {
 			// Tell server user information
 			out.println(user.toJSONString());
 
-			Util.println("Successfully connected to server.");
+//			Util.println("Successfully connected to server.");
 			while (isRunning) {
 				if (scan.hasNext()) {
 					String command = scan.nextLine();
@@ -80,10 +81,13 @@ public class Client {
 				break;
 			case "/whisper":
 			case "/message":
-				String recipient = splits[1];
-				// Check to see of recipient is in server or not.
-				if(users.contains(recipient)) {
-					out.println(MessageFactory.createPrivateMessage(user, recipient, splits[2]));
+				if(splits.length > 2) {
+					String recipient = splits[1];
+					// Check to see of recipient is in server or not.
+					if(users.contains(recipient)) {
+						String pm = String.join(" ", Arrays.copyOfRange(splits, 2, splits.length));
+						out.println(MessageFactory.createPrivateMessage(user, recipient, pm));
+					}
 				}
 				break;
 			case "/users":

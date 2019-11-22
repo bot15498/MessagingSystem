@@ -72,9 +72,9 @@ public class Server {
 
 	public synchronized void addThread(User user, ServerHandleClientThread thread) {
 		// At the same time, broadcast to all threads that there is a new user.
-		broadcastMessage(MessageFactory.createUserConnectedMessage(user, connectedUsers.values()));
 		connectedThreads.put(user.getNickname(), thread);
 		connectedUsers.put(user.getNickname(), user);
+		broadcastMessage(MessageFactory.createUserConnectedMessage(user, connectedUsers.values()));
 	}
 
 	public synchronized void removeThread(User user) {
@@ -88,7 +88,7 @@ public class Server {
 		}
 	}
 
-	public synchronized void broadcastMessage(User sender, String msg) {
+	public synchronized void broadcastGlobalMessage(User sender, String msg) {
 		JSONObject json = MessageFactory.createGlobalMessage(sender, msg);
 		for (ServerHandleClientThread thread : connectedThreads.values()) {
 			thread.sendMessageToClient(json);
@@ -99,6 +99,7 @@ public class Server {
 		if (connectedUsers.containsKey(recipient)) {
 			JSONObject json = MessageFactory.createPrivateMessage(sender, recipient, msg);
 			connectedThreads.get(recipient).sendMessageToClient(json);
+			connectedThreads.get(sender.getNickname()).sendMessageToClient(json);
 		}
 	}
 
@@ -107,6 +108,7 @@ public class Server {
 		String sender = (String) json.get(PrivateMessageFields.SENDER);
 		if (connectedUsers.containsKey(recipient)) {
 			connectedThreads.get(recipient).sendMessageToClient(json);
+			connectedThreads.get(sender).sendMessageToClient(json);
 		} else {
 			// send a message back to the sender to tell them that user not found.
 			connectedThreads.get(sender).sendMessageToClient(MessageFactory.createWarningMessage("User " + recipient + " not found."));
@@ -118,7 +120,7 @@ public class Server {
 		Util.println("Shutting down server.");
 		broadcastMessage(MessageFactory.createShutdownMessage());
 		isRunning = false;
-		if(serverSocket != null) {
+		if (serverSocket != null) {
 			try {
 				serverSocket.close();
 			} catch (IOException e) {

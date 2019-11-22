@@ -61,8 +61,8 @@ public class ClientReceiveThread extends Thread {
 				rawMsg = (String) msg.get(PrivateMessageFields.TEXT);
 				nickname = (String) msg.get(PrivateMessageFields.SENDER);
 				recipient = (String) msg.get(PrivateMessageFields.RECIPIENT);
-				if (currUser.getNickname().equals(recipient)) {
-					Util.println(nickname + " (Whisper): " + rawMsg);
+				if (currUser.getNickname().equals(recipient) || currUser.getNickname().equals(nickname)) {
+					Util.println(nickname + " to " + recipient + ": " + rawMsg);
 				}
 				break;
 			case MessageTypes.SERVER_MSG:
