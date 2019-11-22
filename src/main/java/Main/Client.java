@@ -52,8 +52,7 @@ public class Client {
 			serverSocket.close();
 			Util.println("Disconnected from server.");
 		} catch (IOException e) {
-			System.err.println("Connection with Main.Server failed.");
-			e.printStackTrace();
+			System.out.println("Connection with Server failed. Closing Program.");
 		}
 	}
 
