@@ -80,7 +80,11 @@ public class Client {
 				break;
 			case "/whisper":
 			case "/message":
-				out.println(MessageFactory.createPrivateMessage(user, splits[1], splits[2]));
+				String recipient = splits[1];
+				// Check to see of recipient is in server or not.
+				if(users.contains(recipient)) {
+					out.println(MessageFactory.createPrivateMessage(user, recipient, splits[2]));
+				}
 				break;
 			case "/users":
 			case "/u":

@@ -66,6 +66,7 @@ public class ServerHandleClientThread extends Thread {
 	}
 
 	public void sendMessageToClient(JSONObject msg) {
+		msg.put(MessageFields.SEND_TIME, System.currentTimeMillis());
 		out.println(msg.toJSONString());
 	}
 

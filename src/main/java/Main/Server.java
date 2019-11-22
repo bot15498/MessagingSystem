@@ -103,8 +103,13 @@ public class Server {
 	}
 
 	public synchronized void sendPrivateMessage(JSONObject json) {
-		if (connectedUsers.containsKey((String) json.get(PrivateMessageFields.RECIPIENT))) {
-			connectedThreads.get((String) json.get(PrivateMessageFields.RECIPIENT)).sendMessageToClient(json);
+		String recipient = (String) json.get(PrivateMessageFields.RECIPIENT);
+		String sender = (String) json.get(PrivateMessageFields.SENDER);
+		if (connectedUsers.containsKey(recipient)) {
+			connectedThreads.get(recipient).sendMessageToClient(json);
+		} else {
+			// send a message back to the sender to tell them that user not found.
+			connectedThreads.get(sender).sendMessageToClient(MessageFactory.createWarningMessage("User " + recipient + " not found."));
 		}
 	}
 

@@ -83,4 +83,12 @@ public class MessageFactory {
 		s.put(ServerMessageFields.ALL_USERS,ja);
 		return s;
 	}
+
+	public static JSONObject createWarningMessage(String text) {
+		JSONObject s = new JSONObject();
+		s.put(ServerMessageFields.TYPE, MessageTypes.SERVER_MSG);
+		s.put(ServerMessageFields.NOTIFICATION, ServerMessageFields.NotificationTypes.WARNING);
+		s.put(ServerMessageFields.TEXT, text);
+		return s;
+	}
 }
