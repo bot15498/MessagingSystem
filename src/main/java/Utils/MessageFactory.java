@@ -1,7 +1,10 @@
 package Utils;
 
 import Models.User;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+
+import java.util.Collection;
 
 public class MessageFactory {
 	public static JSONObject createUserInitConnectRequestMessage(String nickname) {
@@ -46,6 +49,38 @@ public class MessageFactory {
 		s.put(ServerMessageFields.TYPE, MessageTypes.SERVER_MSG);
 		s.put(ServerMessageFields.NOTIFICATION, ServerMessageFields.NotificationTypes.SERVER_SHUTDOWN);
 		s.put(ServerMessageFields.TEXT, "Server is shutting down.");
+		return s;
+	}
+
+	public static JSONObject createUserConnectedMessage(User newUser, Collection<User> totalUsers) {
+		JSONObject s = new JSONObject();
+		s.put(ServerMessageFields.TYPE, MessageTypes.SERVER_MSG);
+		s.put(ServerMessageFields.NOTIFICATION, ServerMessageFields.NotificationTypes.USER_CONNECTED);
+		s.put(ServerMessageFields.TEXT, "User " + newUser.getNickname() + " connected.");
+		JSONArray ja = new JSONArray();
+		for(User user : totalUsers) {
+			ja.add(user.getNickname());
+		}
+		if(!ja.contains(newUser.getNickname())) {
+			ja.add(newUser.getNickname());
+		}
+		s.put(ServerMessageFields.ALL_USERS,ja);
+		return s;
+	}
+
+	public static JSONObject createUserDisconnectedMessage(User goneUser, Collection<User> totalUsers) {
+		JSONObject s = new JSONObject();
+		s.put(ServerMessageFields.TYPE, MessageTypes.SERVER_MSG);
+		s.put(ServerMessageFields.NOTIFICATION, ServerMessageFields.NotificationTypes.USERS_UPDATE);
+		s.put(ServerMessageFields.TEXT, "User " + goneUser.getNickname() + " disconnected.");
+		JSONArray ja = new JSONArray();
+		for(User user : totalUsers) {
+			ja.add(user.getNickname());
+		}
+		if(ja.contains(goneUser.getNickname())) {
+			ja.remove(goneUser.getNickname());
+		}
+		s.put(ServerMessageFields.ALL_USERS,ja);
 		return s;
 	}
 }

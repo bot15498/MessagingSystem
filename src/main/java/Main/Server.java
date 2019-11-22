@@ -71,6 +71,8 @@ public class Server {
 	}
 
 	public synchronized void addThread(User user, ServerHandleClientThread thread) {
+		// At the same time, broadcast to all threads that there is a new user.
+		broadcastMessage(MessageFactory.createUserConnectedMessage(user, connectedUsers.values()));
 		connectedThreads.put(user.getNickname(), thread);
 		connectedUsers.put(user.getNickname(), user);
 	}

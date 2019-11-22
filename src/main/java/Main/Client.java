@@ -10,32 +10,45 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Scanner;
 
 public class Client {
 	private static final int port = 4444;
 	private static final String hostname = "DESKTOP-IM3S6B7";
-	private static boolean isRunning = true;
-	private static Socket serverSocket;
+	private boolean isRunning = true;
+	private Socket serverSocket;
+	private ClientReceiveThread printThread = null;
+	private User user;
+	private Scanner scan;
+	private ArrayList<String> users; //TODO maybe chang this to list of User objects?
 
 	public static void main(String[] args) {
+		Client client = new Client();
+		client.startListening();
+	}
+
+	public Client() {
 		Util.println("Starting Client...");
 
 		// Get nickname for server purposes
-		Scanner scan = new Scanner(System.in);
+		scan = new Scanner(System.in);
 		Util.println("Enter nickname: ");
 		String nickname = scan.nextLine();
-		User user = new User(nickname);
-		ClientReceiveThread printThread = null;
+		user = new User(nickname);
+		users = new ArrayList<String>();
+	}
 
-		// make connection to Main.Server.
+	private void startListening() {
+		// make connection to Server.
 		try {
 			serverSocket = new Socket(hostname, port);
 			PrintWriter out = new PrintWriter(serverSocket.getOutputStream(), true);
 			BufferedReader in = new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));
 
 			// Start thread for printing messages incomming from server.
-			printThread = new ClientReceiveThread(in, user);
+			printThread = new ClientReceiveThread(this, in, user);
 			printThread.start();
 
 			// Tell server user information
@@ -56,7 +69,7 @@ public class Client {
 		}
 	}
 
-	private static void handleCommand(PrintWriter out, User user, String command) {
+	private void handleCommand(PrintWriter out, User user, String command) {
 		String[] splits = command.split(" ");
 		switch (splits[0]) {
 			case "/disconnect":
@@ -71,6 +84,10 @@ public class Client {
 				break;
 			case "/users":
 			case "/u":
+				Util.println("Connected Users: ");
+				for (String nickname : users) {
+					Util.println("\t" + nickname);
+				}
 				break;
 			default:
 				out.println(MessageFactory.createGlobalMessage(user, command).toJSONString());
@@ -79,7 +96,7 @@ public class Client {
 	}
 
 
-	public static void stopClient() {
+	public void stopClient() {
 		if (serverSocket != null && serverSocket.isConnected()) {
 			try {
 				serverSocket.close();
@@ -88,5 +105,10 @@ public class Client {
 			}
 		}
 		System.exit(0);
+	}
+
+	public void updateUsers(Collection<String> newUsers) {
+		users = null;
+		users = new ArrayList<>(newUsers);
 	}
 }

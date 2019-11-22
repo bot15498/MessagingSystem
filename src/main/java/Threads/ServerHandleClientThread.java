@@ -56,10 +56,7 @@ public class ServerHandleClientThread extends Thread {
 				}
 			} catch (IOException e) {
 				// This gets called if client forcefully disconnects.
-				Util.println("User " + currUser.getNickname() + " disconnected.");
-				isConnected = false;
-				Server.getInstance().removeThread(currUser);
-				currUser = null;
+				closeUser();
 			} catch (ParseException e) {
 				// TODO Figure out what happens if a client sends garbage.
 				// right now just continue listening.
@@ -97,13 +94,20 @@ public class ServerHandleClientThread extends Thread {
 					case UserConnectMessageFields.ConnectTypes.INITIAL_CONNECT:
 						break;
 					case UserConnectMessageFields.ConnectTypes.DISCONNECT:
-						isConnected = false;
-						Server.getInstance().removeThread(currUser);
-						Util.println("User " + currUser.getNickname() + " disconnected.");
-						currUser = null;
+						closeUser();
 						break;
 				}
 				break;
 		}
+	}
+
+	private void closeUser() {
+		isConnected = false;
+		Server.getInstance().removeThread(currUser);
+		Util.println("User " + currUser.getNickname() + " disconnected.");
+		Server.getInstance()
+				.broadcastMessage(MessageFactory
+						.createUserDisconnectedMessage(currUser, Server.getInstance().getListOfUsers()));
+		currUser = null;
 	}
 }

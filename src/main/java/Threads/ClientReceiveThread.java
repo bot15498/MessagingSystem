@@ -3,6 +3,7 @@ package Threads;
 import Main.Client;
 import Models.User;
 import Utils.*;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -14,10 +15,12 @@ public class ClientReceiveThread extends Thread {
 	private BufferedReader in;
 	private boolean isRunning = true;
 	private User currUser;
+	Client client;
 
-	public ClientReceiveThread(BufferedReader in, User user) {
+	public ClientReceiveThread(Client client, BufferedReader in, User user) {
 		this.in = in;
 		currUser = user;
+		this.client = client;
 	}
 
 	public void run() {
@@ -38,6 +41,10 @@ public class ClientReceiveThread extends Thread {
 		}
 	}
 
+	/**
+	 * Handle the 4 different message types that can come in from the server.
+	 * @param msg JSONObject that came in as a message.
+	 */
 	private void handleMessage(JSONObject msg) {
 		String key = (String) msg.get(MessageFields.TYPE);
 		String rawMsg, nickname, recipient;
@@ -64,10 +71,17 @@ public class ClientReceiveThread extends Thread {
 		}
 	}
 
+	/**
+	 * Shutdown socket thread that listens for text from server.
+	 */
 	public void stopListening() {
 		isRunning = false;
 	}
 
+	/**
+	 * Handle the different types of Server Messages that the server can send.
+	 * @param json The JSONObject message from server.
+	 */
 	private void handleServerMessages(JSONObject json) {
 		String key = (String) json.get(ServerMessageFields.NOTIFICATION);
 		String rawMsg;
@@ -75,14 +89,16 @@ public class ClientReceiveThread extends Thread {
 			case ServerMessageFields.NotificationTypes.SERVER_SHUTDOWN:
 				rawMsg = (String) json.get(ServerMessageFields.TEXT);
 				Util.println(rawMsg);
-				Client.stopClient();
+				client.stopClient();
 				break;
 			case ServerMessageFields.NotificationTypes.USER_CONNECTED:
 				// print the message which should have new name of person then update users list
-				rawMsg = (String) json.get(ServerMessageFields.TEXT);
-				Util.println("User " + rawMsg + " connected.");
 			case ServerMessageFields.NotificationTypes.USERS_UPDATE:
+				rawMsg = (String) json.get(ServerMessageFields.TEXT);
+				Util.println(rawMsg);
 				// update users list
+				JSONArray ja = (JSONArray) json.get(ServerMessageFields.ALL_USERS);
+				client.updateUsers(ja);
 				break;
 			case ServerMessageFields.NotificationTypes.WARNING:
 				// just display the warning
