@@ -4,7 +4,6 @@ import Models.User;
 import Threads.ClientReceiveThread;
 import Utils.MessageFactory;
 import Utils.Util;
-import org.json.simple.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -17,6 +16,7 @@ public class Client {
 	private static final int port = 4444;
 	private static final String hostname = "DESKTOP-IM3S6B7";
 	private static boolean isRunning = true;
+	private static Socket serverSocket;
 
 	public static void main(String[] args) {
 		Util.println("Starting Client...");
@@ -30,7 +30,7 @@ public class Client {
 
 		// make connection to Main.Server.
 		try {
-			Socket serverSocket = new Socket(hostname, port);
+			serverSocket = new Socket(hostname, port);
 			PrintWriter out = new PrintWriter(serverSocket.getOutputStream(), true);
 			BufferedReader in = new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));
 
@@ -43,8 +43,10 @@ public class Client {
 
 			Util.println("Successfully connected to server.");
 			while (isRunning) {
-				String command = scan.nextLine();
-				handleCommand(out, user, command);
+				if (scan.hasNext()) {
+					String command = scan.nextLine();
+					handleCommand(out, user, command);
+				}
 			}
 			printThread.stopListening();
 			serverSocket.close();
@@ -55,9 +57,9 @@ public class Client {
 		}
 	}
 
-	public static void handleCommand(PrintWriter out, User user, String command) {
+	private static void handleCommand(PrintWriter out, User user, String command) {
 		String[] splits = command.split(" ");
-		switch(splits[0]) {
+		switch (splits[0]) {
 			case "/disconnect":
 			case "/leave":
 				out.println(MessageFactory.createUserDisconnectRequestMessage(user).toJSONString());
@@ -66,7 +68,7 @@ public class Client {
 				break;
 			case "/whisper":
 			case "/message":
-				out.println(MessageFactory.createPrivateMessage(user, splits[1],splits[2]));
+				out.println(MessageFactory.createPrivateMessage(user, splits[1], splits[2]));
 				break;
 			case "/users":
 			case "/u":
@@ -75,5 +77,17 @@ public class Client {
 				out.println(MessageFactory.createGlobalMessage(user, command).toJSONString());
 				break;
 		}
+	}
+
+
+	public static void stopClient() {
+		if (serverSocket != null && serverSocket.isConnected()) {
+			try {
+				serverSocket.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		System.exit(0);
 	}
 }

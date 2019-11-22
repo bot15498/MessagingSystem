@@ -40,4 +40,12 @@ public class MessageFactory {
 		s.put(PrivateMessageFields.SEND_TIME, System.currentTimeMillis());
 		return s;
 	}
+
+	public static JSONObject createShutdownMessage() {
+		JSONObject s = new JSONObject();
+		s.put(ServerMessageFields.TYPE, MessageTypes.SERVER_MSG);
+		s.put(ServerMessageFields.NOTIFICATION, ServerMessageFields.NotificationTypes.SERVER_SHUTDOWN);
+		s.put(ServerMessageFields.TEXT, "Server is shutting down.");
+		return s;
+	}
 }

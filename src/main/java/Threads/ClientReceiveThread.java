@@ -1,5 +1,6 @@
 package Threads;
 
+import Main.Client;
 import Models.User;
 import Utils.*;
 import org.json.simple.JSONObject;
@@ -58,12 +59,36 @@ public class ClientReceiveThread extends Thread {
 				}
 				break;
 			case MessageTypes.SERVER_MSG:
-				// TODO handle server messages?
+				handleServerMessages(msg);
 				break;
 		}
 	}
 
 	public void stopListening() {
 		isRunning = false;
+	}
+
+	private void handleServerMessages(JSONObject json) {
+		String key = (String) json.get(ServerMessageFields.NOTIFICATION);
+		String rawMsg;
+		switch (key) {
+			case ServerMessageFields.NotificationTypes.SERVER_SHUTDOWN:
+				rawMsg = (String) json.get(ServerMessageFields.TEXT);
+				Util.println(rawMsg);
+				Client.stopClient();
+				break;
+			case ServerMessageFields.NotificationTypes.USER_CONNECTED:
+				// print the message which should have new name of person then update users list
+				rawMsg = (String) json.get(ServerMessageFields.TEXT);
+				Util.println("User " + rawMsg + " connected.");
+			case ServerMessageFields.NotificationTypes.USERS_UPDATE:
+				// update users list
+				break;
+			case ServerMessageFields.NotificationTypes.WARNING:
+				// just display the warning
+				rawMsg = (String) json.get(ServerMessageFields.TEXT);
+				Util.println("SERVER WARNING: " + rawMsg);
+				break;
+		}
 	}
 }

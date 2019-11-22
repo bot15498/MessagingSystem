@@ -4,7 +4,6 @@ import Main.Server;
 import Models.User;
 import Utils.*;
 import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import java.io.BufferedReader;
@@ -80,7 +79,7 @@ public class ServerHandleClientThread extends Thread {
 				// just update the timestamp and user (just in case) and rebraodcast.
 				if (currUser.getNickname().equals(json.get(GlobalMessageFields.SENDER))) {
 					JSONObject j = Util.updateTimestamp(json);
-					Server.getInstance().broadcastGlobalMessage(j);
+					Server.getInstance().broadcastMessage(j);
 				}
 				break;
 			case MessageTypes.PRIVATE_CHAT_MSG:

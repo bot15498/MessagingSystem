@@ -19,6 +19,7 @@ public class Server {
 	private ServerSocket serverSocket = null;
 	private HashMap<String, ServerHandleClientThread> connectedThreads = new HashMap<String, ServerHandleClientThread>();
 	private HashMap<String, User> connectedUsers = new HashMap<String, User>();
+	private boolean isRunning = true;
 
 	// Static stuff
 	private static final int port = 4444;
@@ -27,6 +28,7 @@ public class Server {
 	public static void main(String[] args) {
 		Server server = Server.getInstance();
 		server.handleIncommingRequests();
+		System.exit(0);
 	}
 
 	private Server() {
@@ -52,7 +54,7 @@ public class Server {
 		ServerCommandsThread commandsThread = new ServerCommandsThread();
 		commandsThread.start();
 		// now listen for incomming requests and create a server thread if a socket is found
-		while (true) {
+		while (isRunning) {
 			try {
 				clientSocket = serverSocket.accept();
 			} catch (IOException e) {
@@ -78,13 +80,13 @@ public class Server {
 		connectedUsers.remove(user.getNickname());
 	}
 
-	public synchronized void broadcastGlobalMessage(JSONObject msg) {
+	public synchronized void broadcastMessage(JSONObject msg) {
 		for (ServerHandleClientThread thread : connectedThreads.values()) {
 			thread.sendMessageToClient(msg);
 		}
 	}
 
-	public synchronized void broadcastGlobalMessage(User sender, String msg) {
+	public synchronized void broadcastMessage(User sender, String msg) {
 		JSONObject json = MessageFactory.createGlobalMessage(sender, msg);
 		for (ServerHandleClientThread thread : connectedThreads.values()) {
 			thread.sendMessageToClient(json);
@@ -102,5 +104,20 @@ public class Server {
 		if (connectedUsers.containsKey((String) json.get(PrivateMessageFields.RECIPIENT))) {
 			connectedThreads.get((String) json.get(PrivateMessageFields.RECIPIENT)).sendMessageToClient(json);
 		}
+	}
+
+	public synchronized void stopServer() {
+		// server is shutting down.
+		Util.println("Shutting down server.");
+		broadcastMessage(MessageFactory.createShutdownMessage());
+		isRunning = false;
+		if(serverSocket != null) {
+			try {
+				serverSocket.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		System.exit(0);
 	}
 }

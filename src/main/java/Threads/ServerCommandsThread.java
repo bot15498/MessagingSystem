@@ -32,11 +32,13 @@ public class ServerCommandsThread extends Thread {
 					break;
 				case "/close":
 				case "/stop":
+					Server.getInstance().stopServer();
 					break;
 				default:
 					printHelp();
 					break;
 			}
+			yield();
 		}
 	}
 
