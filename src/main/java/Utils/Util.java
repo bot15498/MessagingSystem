@@ -54,7 +54,7 @@ public class Util {
 				}
 				Scene scene = flow.getScene();
 				ScrollPane pane = (ScrollPane) scene.lookup("#textScrollPane");
-				pane.setVvalue(1.0);
+				pane.setVvalue(1.5);
 			}
 		});
 	}

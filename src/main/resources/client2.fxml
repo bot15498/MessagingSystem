@@ -19,8 +19,11 @@
               <content>
                 <AnchorPane minHeight="0.0" minWidth="0.0">
                      <children>
-                        <TextFlow fx:id="chatDisplayFlow" />
+                        <TextFlow fx:id="chatDisplayFlow" AnchorPane.topAnchor="0.0" />
                      </children>
+                     <padding>
+                        <Insets bottom="27.0" />
+                     </padding>
                   </AnchorPane>
               </content>
             </ScrollPane>
