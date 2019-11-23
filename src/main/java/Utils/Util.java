@@ -1,5 +1,6 @@
 package Utils;
 
+import javafx.scene.control.TextArea;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -23,5 +24,10 @@ public class Util {
 
 	public static JSONObject stringToJson(String s) throws ParseException {
 		return (JSONObject) new JSONParser().parse(s);
+	}
+
+	public static void printlnToChatArea(TextArea area, String s) {
+		String old = area.getText();
+		area.setText(old + s + "\n");
 	}
 }
