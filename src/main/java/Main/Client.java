@@ -41,7 +41,7 @@ public class Client extends Application {
 	public void start(Stage primaryStage) throws Exception {
 		// scene builder is high quality trash.
 		FXMLLoader loader = new FXMLLoader();
-		loader.setLocation(getClass().getResource("/client.fxml"));
+		loader.setLocation(getClass().getResource("/client2.fxml"));
 		controller = new ClientController(port, hostname);
 		loader.setController(controller);
 		Parent root = loader.load();

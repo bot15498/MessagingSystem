@@ -56,7 +56,8 @@ public class ClientReceiveThread extends Thread {
 				rawMsg = (String) msg.get(GlobalMessageFields.TEXT);
 				nickname = (String) msg.get(GlobalMessageFields.SENDER);
 				Util.println(nickname + ": " + rawMsg);
-				Util.printlnToChatArea(client.getChatShowText(), nickname + ": " + rawMsg);
+//				Util.printlnToChatArea(client.getChatShowText(), nickname + ": " + rawMsg);
+				Util.printlnMessageToChat(client.getChatFlow(), nickname + ": ", rawMsg);
 				break;
 			case MessageTypes.USER_CONNECT:
 				// TODO ???
@@ -67,7 +68,8 @@ public class ClientReceiveThread extends Thread {
 				recipient = (String) msg.get(PrivateMessageFields.RECIPIENT);
 				if (currUser.getNickname().equals(recipient) || currUser.getNickname().equals(nickname)) {
 					Util.println(nickname + " to " + recipient + ": " + rawMsg);
-					Util.printlnToChatArea(client.getChatShowText(), nickname + " to " + recipient + ": " + rawMsg);
+//					Util.printlnToChatArea(client.getChatShowText(), nickname + " to " + recipient + ": " + rawMsg);
+					Util.printlnMessageToChat(client.getChatFlow(), nickname + " to " + recipient + ": ", rawMsg);
 				}
 				break;
 			case MessageTypes.SERVER_MSG:
@@ -95,7 +97,8 @@ public class ClientReceiveThread extends Thread {
 			case ServerMessageFields.NotificationTypes.SERVER_SHUTDOWN:
 				rawMsg = (String) json.get(ServerMessageFields.TEXT);
 				Util.println(rawMsg);
-				Util.printlnToChatArea(client.getChatShowText(), rawMsg);
+//				Util.printlnToChatArea(client.getChatShowText(), rawMsg);
+				Util.printlnMessageToChat(client.getChatFlow(), "SERVER: ", rawMsg);
 				client.stopClient();
 				break;
 			case ServerMessageFields.NotificationTypes.USER_CONNECTED:
@@ -103,7 +106,8 @@ public class ClientReceiveThread extends Thread {
 			case ServerMessageFields.NotificationTypes.USERS_UPDATE:
 				rawMsg = (String) json.get(ServerMessageFields.TEXT);
 				Util.println(rawMsg);
-				Util.printlnToChatArea(client.getChatShowText(), rawMsg);
+//				Util.printlnToChatArea(client.getChatShowText(), rawMsg);
+				Util.printlnMessageToChat(client.getChatFlow(), rawMsg, "");
 				// update users list
 				JSONArray ja = (JSONArray) json.get(ServerMessageFields.ALL_USERS);
 				ArrayList<String> names = new ArrayList<String>();
@@ -116,7 +120,8 @@ public class ClientReceiveThread extends Thread {
 				// just display the warning
 				rawMsg = (String) json.get(ServerMessageFields.TEXT);
 				Util.println("SERVER WARNING: " + rawMsg);
-				Util.printlnToChatArea(client.getChatShowText(), "SERVER WARNING: " + rawMsg);
+//				Util.printlnToChatArea(client.getChatShowText(), "SERVER WARNING: " + rawMsg);
+				Util.printlnMessageToChat(client.getChatFlow(), "SERVER WARNING: ", rawMsg);
 				break;
 		}
 	}

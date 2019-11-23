@@ -11,6 +11,7 @@ import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 
 import java.io.BufferedReader;
@@ -26,6 +27,8 @@ import java.util.Scanner;
 public class ClientController {
 	@FXML
 	protected TextArea chatDisplayArea;
+	@FXML
+	protected TextFlow chatDisplayFlow;
 	@FXML
 	protected Label nicknameLabel;
 	@FXML
@@ -142,6 +145,7 @@ public class ClientController {
 	public void stopClient() {
 		if (serverSocket != null && serverSocket.isConnected()) {
 			try {
+				out.println(MessageFactory.createUserDisconnectRequestMessage(user).toJSONString());
 				serverSocket.close();
 				Util.println("Socket closed.");
 			} catch (IOException e) {
@@ -164,5 +168,9 @@ public class ClientController {
 
 	public TextArea getChatShowText() {
 		return chatDisplayArea;
+	}
+
+	public TextFlow getChatFlow() {
+		return chatDisplayFlow;
 	}
 }

@@ -1,6 +1,13 @@
 package Utils;
 
+import javafx.application.Platform;
+import javafx.geometry.Orientation;
+import javafx.scene.Scene;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Separator;
 import javafx.scene.control.TextArea;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -28,6 +35,25 @@ public class Util {
 
 	public static void printlnToChatArea(TextArea area, String s) {
 		String old = area.getText();
-		area.setText(old + s + "\n");
+		area.appendText(s + "\n");
+	}
+
+	public static void printlnMessageToChat(TextFlow flow, String bold, String msg) {
+		Text sendText = new Text(bold);
+		sendText.setStyle("-fx-fill: #000000;-fx-font-weight:bold;");
+		Text msgText = new Text(msg);
+		Platform.runLater(new Runnable() {
+			public void run() {
+				flow.getChildren().add(new Text(System.lineSeparator()));
+				if(msg.equals("")) {
+					flow.getChildren().addAll(sendText);
+				} else {
+					flow.getChildren().addAll(sendText, msgText);
+				}
+				Scene scene = flow.getScene();
+				ScrollPane pane = (ScrollPane) scene.lookup("#textScrollPane");
+				pane.setVvalue(1.0);
+			}
+		});
 	}
 }
