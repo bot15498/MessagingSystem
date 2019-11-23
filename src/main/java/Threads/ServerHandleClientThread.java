@@ -54,6 +54,8 @@ public class ServerHandleClientThread extends Thread {
 					handleIncommingMessage(json);
 					yield();
 				}
+				socket.close();
+				Util.println("Closed socket");
 			} catch (IOException e) {
 				// This gets called if client forcefully disconnects.
 				closeUser();

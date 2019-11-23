@@ -6,6 +6,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TextArea;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import org.json.simple.JSONObject;
@@ -40,8 +41,9 @@ public class Util {
 
 	public static void printlnMessageToChat(TextFlow flow, String bold, String msg) {
 		Text sendText = new Text(bold);
-		sendText.setStyle("-fx-fill: #000000;-fx-font-weight:bold;");
+		sendText.setStyle("-fx-fill: #000000;-fx-font-weight:bold;-fx-font-size:16px;-fx-font-family: 'Helvetica';");
 		Text msgText = new Text(msg);
+		msgText.setStyle("-fx-font-size:16px;-fx-fill: #000000;-fx-font-family: 'Helvetica';");
 		Platform.runLater(new Runnable() {
 			public void run() {
 				flow.getChildren().add(new Text(System.lineSeparator()));

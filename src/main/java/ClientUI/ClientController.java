@@ -9,8 +9,10 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 
@@ -19,10 +21,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Scanner;
+import java.util.*;
 
 public class ClientController {
 	@FXML
@@ -37,6 +36,8 @@ public class ClientController {
 	protected Button sendButton;
 	@FXML
 	protected ListView<String> userList;
+	@FXML
+	protected ScrollPane textScrollPane;
 
 	private int port;
 	private String hostname;
@@ -57,6 +58,18 @@ public class ClientController {
 	public void initialize() {
 		askNickname();
 		nicknameLabel.setText(user.getNickname());
+		textScrollPane.setFocusTraversable(false);
+		userList.setOnMouseClicked(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent event) {
+				String clickedName = userList.getSelectionModel().getSelectedItem();
+				if(clickedName != null && !clickedName.equals("null") && !inputField.getText().startsWith("/")) {
+					String curr = inputField.getText();
+					inputField.setText("/whisper " + clickedName + " " + curr);
+					inputField.requestFocus();
+				}
+			}
+		});
 		startListening();
 	}
 
@@ -78,9 +91,25 @@ public class ClientController {
 
 	private void askNickname() {
 		// Get nickname for server purposes
-		Scanner scan = new Scanner(System.in);
-		Util.println("Enter nickname: ");
-		String nickname = scan.nextLine();
+//		Scanner scan = new Scanner(System.in);
+//		Util.println("Enter nickname: ");
+//		String nickname = scan.nextLine();
+//		user = new User(nickname);
+//		users = new ArrayList<String>();
+
+		String nickname = "";
+		while (nickname.equals("")) {
+			TextInputDialog dialog = new TextInputDialog("");
+			dialog.setTitle("Enter Nickname");
+			dialog.setHeaderText("Enter chat nickname:");
+			dialog.setContentText("Name:");
+
+			Optional<String> result = dialog.showAndWait();
+			if (result.isPresent()) {
+				nickname = result.get();
+			}
+		}
+
 		user = new User(nickname);
 		users = new ArrayList<String>();
 	}
