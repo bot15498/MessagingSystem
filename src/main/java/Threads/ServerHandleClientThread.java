@@ -37,6 +37,11 @@ public class ServerHandleClientThread extends Thread {
 			JSONObject json = Util.stringToJson(user);
 			if (json.get(UserConnectMessageFields.TYPE).equals(MessageTypes.USER_CONNECT)) {
 				currUser = new User(json);
+				if(Server.getInstance().getListOfNicknames().contains(currUser.getNickname())) {
+					sendMessageToClient(MessageFactory.createShutdownMessage());
+					isConnected = false;
+					socket.close();
+				}
 				Util.println("User " + currUser.getNickname() + " connected.");
 				Server.getInstance().addThread(currUser, this);
 			}
@@ -84,7 +89,7 @@ public class ServerHandleClientThread extends Thread {
 				break;
 			case MessageTypes.PRIVATE_CHAT_MSG:
 				// send to only that one person
-				if (currUser.getNickname().equals(json.get(PrivateMessageFields.SENDER))) {
+				if (currUser.getNickname().equals((String) json.get(PrivateMessageFields.SENDER))) {
 					JSONObject j = Util.updateTimestamp(json);
 					Server.getInstance().sendPrivateMessage(j);
 				}

@@ -1,25 +1,12 @@
 package Main;
 
 import ClientUI.ClientController;
-import Models.User;
-import Threads.ClientReceiveThread;
-import Utils.MessageFactory;
 import Utils.Util;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.Socket;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Scanner;
 
 public class Client extends Application {
 	private static final int port = 4444;

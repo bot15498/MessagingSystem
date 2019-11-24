@@ -26,7 +26,7 @@ public class Util {
 	}
 
 	public static JSONObject updateTimestamp(JSONObject json) {
-		json.put(MessageFields.SEND_TIME, System.currentTimeMillis());
+		json.put(Utils.MessageFields.SEND_TIME, System.currentTimeMillis());
 		return json;
 	}
 

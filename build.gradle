@@ -18,3 +18,36 @@ dependencies {
     compile group: 'org.openjfx', name: 'javafx', version: '11', ext: 'pom'
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
+
+//create a single Jar with all dependencies
+task makeServerJar(type: Jar) {
+    manifest {
+        attributes 'Main-Class': 'Main.Server'
+    }
+    baseName = 'Server'
+    from {
+        (configurations.compile.findAll { !it.path.endsWith(".pom") }).collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
+    with jar
+}
+
+
+//create a single Jar with all dependencies
+task makeClientJar(type: Jar) {
+    manifest {
+        attributes 'Main-Class': 'Main.Client'
+    }
+    baseName = 'Client'
+    from {
+        (configurations.compile.findAll { !it.path.endsWith(".pom") }).collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
+    with jar
+}
+
+task makeJars(type: GradleBuild) {
+    tasks = ['clean', 'build', 'makeClientJar', 'makeServerJar']
+}

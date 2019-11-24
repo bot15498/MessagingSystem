@@ -11,7 +11,6 @@ import org.json.simple.JSONObject;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
@@ -68,6 +67,10 @@ public class Server {
 
 	public synchronized Collection<User> getListOfUsers() {
 		return connectedUsers.values();
+	}
+
+	public synchronized Collection<String> getListOfNicknames() {
+		return connectedUsers.keySet();
 	}
 
 	public synchronized void addThread(User user, ServerHandleClientThread thread) {

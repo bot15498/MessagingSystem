@@ -1,7 +1,6 @@
 package Threads;
 
 import ClientUI.ClientController;
-import Main.Client;
 import Models.User;
 import Utils.*;
 import org.json.simple.JSONArray;
