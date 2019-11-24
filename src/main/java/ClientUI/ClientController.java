@@ -47,9 +47,7 @@ public class ClientController {
 	private BufferedReader in;
 	private ArrayList<String> users;
 
-	public ClientController(int port, String hostname) {
-		this.port = port;
-		this.hostname = hostname;
+	public ClientController() {
 	}
 
 	@FXML
@@ -61,7 +59,7 @@ public class ClientController {
 			@Override
 			public void handle(MouseEvent event) {
 				String clickedName = userList.getSelectionModel().getSelectedItem();
-				if(clickedName != null && !clickedName.equals("null") && !inputField.getText().startsWith("/")) {
+				if (clickedName != null && !clickedName.equals("null") && !inputField.getText().startsWith("/")) {
 					String curr = inputField.getText();
 					inputField.setText("/whisper " + clickedName + " " + curr);
 					inputField.requestFocus();
@@ -96,6 +94,8 @@ public class ClientController {
 //		users = new ArrayList<String>();
 
 		String nickname = "";
+		String host = "";
+		int port = -1;
 		while (nickname.equals("")) {
 			TextInputDialog dialog = new TextInputDialog("");
 			dialog.setTitle("Enter Nickname");
@@ -107,9 +107,38 @@ public class ClientController {
 				nickname = result.get();
 			}
 		}
+		while (host.equals("")) {
+			TextInputDialog dialog = new TextInputDialog("");
+			dialog.setTitle("Enter Host");
+			dialog.setHeaderText("Enter Hostname:");
+			dialog.setContentText("Hostname:");
+
+			Optional<String> result = dialog.showAndWait();
+			if (result.isPresent()) {
+				host = result.get();
+			}
+		}
+		while (port == -1) {
+			TextInputDialog dialog = new TextInputDialog("");
+			dialog.setTitle("Enter Port");
+			dialog.setHeaderText("Enter Port to Connect To:");
+			dialog.setContentText("Port:");
+
+			Optional<String> result = dialog.showAndWait();
+			if (result.isPresent()) {
+				String portStr = result.get();
+				try {
+					port = Integer.parseInt(portStr);
+				} catch (NumberFormatException e) {
+					port = -1;
+				}
+			}
+		}
 
 		user = new User(nickname);
 		users = new ArrayList<String>();
+		this.port = port;
+		this.hostname = host;
 	}
 
 	private void startListening() {
@@ -128,6 +157,10 @@ public class ClientController {
 			isRunning = true;
 		} catch (IOException e) {
 			System.out.println("Connection with Server failed. Closing Program.");
+			// create a alert
+			Alert a = new Alert(Alert.AlertType.ERROR);
+			a.setContentText("Connection with Server failed. Closing Program.");
+			a.showAndWait();
 			System.exit(0);
 		}
 	}

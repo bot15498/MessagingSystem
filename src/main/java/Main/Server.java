@@ -21,10 +21,23 @@ public class Server {
 	private boolean isRunning = true;
 
 	// Static stuff
-	private static final int port = 4444;
+	private static int port = 4444;
 	private static Server instance;
 
 	public static void main(String[] args) {
+		int portNum = -1;
+		if(args.length < 1) {
+			System.err.println("Error: Did not specify port to start on. Terminating");
+			System.exit(1);
+		}
+		try {
+			portNum = Integer.parseInt(args[0]);
+		} catch (NumberFormatException e) {
+			System.err.println("Error: Port Specified was not a number. Terminating");
+			System.exit(1);
+		}
+		port = portNum;
+
 		Server server = Server.getInstance();
 		server.handleIncommingRequests();
 		System.exit(0);
