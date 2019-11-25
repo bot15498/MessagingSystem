@@ -182,10 +182,12 @@ public class ClientController {
 				if (splits.length > 2) {
 					String recipient = splits[1];
 					// Check to see of recipient is in server or not.
-					if (users.contains(recipient)) {
-						String pm = String.join(" ", Arrays.copyOfRange(splits, 2, splits.length));
-						out.println(MessageFactory.createPrivateMessage(user, recipient, pm));
-					}
+//					if (users.contains(recipient)) {
+//						String pm = String.join(" ", Arrays.copyOfRange(splits, 2, splits.length));
+//						out.println(MessageFactory.createPrivateMessage(user, recipient, pm));
+//					}
+					String pm = String.join(" ", Arrays.copyOfRange(splits, 2, splits.length));
+					out.println(MessageFactory.createPrivateMessage(user, recipient, pm));
 				}
 				break;
 			case "/users":
